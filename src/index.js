@@ -11,14 +11,14 @@ const transformLineEnding = (string, lineEnding) => {
   string = (string != null ? string.toString() : "");
 
   if (lineEnding === LineEndings.CR) {
-    string = LineEndingReplacements.replaceCRLF(string, "\r");
-    string = LineEndingReplacements.replaceLF(string, "\r");
+    string = replaceCRLF(string, "\r");
+    string = replaceLF(string, "\r");
   } else if (lineEnding === LineEndings.LF) {
-    string = LineEndingReplacements.replaceCRLF(string, "\n");
-    string = LineEndingReplacements.replaceCR(string, "\n");
+    string = replaceCRLF(string, "\n");
+    string = replaceCR(string, "\n");
   } else if (lineEnding === LineEndings.CRLF) {
-    string = LineEndingReplacements.replaceCR(string, "\r\n");
-    string = LineEndingReplacements.replaceLF(string, "\r\n");
+    string = replaceCR(string, "\r\n");
+    string = replaceLF(string, "\r\n");
   }
   return string;
 };
@@ -29,18 +29,20 @@ const LineEndings = {
   CRLF: "CRLF"
 };
 
+function replaceCR(string, newEnding) {
+return string.replace(/(\r+)([^\n]|$)/g, (_match, p1, p2) => {
+  return `${newEnding.repeat(p1.length)}${p2}`
+})}
+
+function replaceLF(string, newEnding) {
+return string.replace(/([^\r]|^)(\n+)/g, (_match, p1, p2) => {
+  return `${p1}${newEnding.repeat(p2.length)}`;
+})}
+
+function replaceCRLF(string, newEnding) { return string.replace(/\r\n/g, `${newEnding}`)}
+
 const LineEndingReplacements = {
-  replaceCR: (string, newEnding) =>
-    string.replace(/(\r+)([^\n]|$)/g, (_match, p1, p2) => {
-      return `${newEnding.repeat(p1.length)}${p2}`;
-    }),
 
-  replaceLF: (string, newEnding) =>
-    string.replace(/([^\r]|^)(\n+)/g, (_match, p1, p2) => {
-      return `${p1}${newEnding.repeat(p2.length)}`;
-    }),
-
-  replaceCRLF: (string, newEnding) => string.replace(/\r\n/g, `${newEnding}`)
 };
 
 module.exports = {
